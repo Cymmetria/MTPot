@@ -1,0 +1,19 @@
+{
+    "port": 23,
+    "ddos_name": "Mirai",
+    "ip": "0.0.0.0",
+    "commands": {
+        "ECCHI": "ECCHI: applet not found",
+        "ps": "1 pts/21   00:00:00 init",
+        "cat /proc/mounts": "tmpfs /run tmpfs rw,nosuid,noexec,relatime,size=1635616k,mode=755 0 0",
+        "echo -e \\x6b\\x61\\x6d\\x69/dev > /dev/.nippon": "",
+        "cat /dev/.nippon": "kami/dev",
+        "rm /dev/.nippon": "",
+        "echo -e \\x6b\\x61\\x6d\\x69/run > /run/.nippon": "",
+        "cat /run/.nippon": "kami/run",
+        "rm /run/.nippon": ""
+    },
+    "syslog_address": "127.0.0.1",
+    "syslog_port": 5555,
+    "syslog_protocol": "UDP"
+}

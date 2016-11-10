@@ -1,0 +1,11 @@
+{
+    "port": 23,
+    "ddos_name": "Mirai Scanner",
+    "ip": "0.0.0.0",
+    "commands": {
+        "MIRAI": "MIRAI: applet not found"
+    },
+    "syslog_address": "127.0.0.1",
+    "syslog_port": 5555,
+    "syslog_protocol": "UDP"
+}
