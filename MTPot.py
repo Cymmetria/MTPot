@@ -93,7 +93,7 @@ class MyTelnetHandler(TelnetHandler):
 
     def handleException(self, exc_type, exc_param, exc_tb):
         # Overide default exception handling behaviour
-        honey_logger.debug(traceback.format_exception(exc_type, exc_param, exc_tb))
+        honey_logger.debug(traceback.format_exc())
         return True
 
 def get_args():
