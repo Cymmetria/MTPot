@@ -34,7 +34,7 @@ class MyTelnetHandler(TelnetHandler):
     @command([BUSY_BOX])
     def handle_busybox(self, params):
         full_response = self.get_busybox_response(params)
-        honey_logger.debug("Responding: %s", full_response)
+        honey_logger.debug("[%s] Responding: %s", self.client_address[0], full_response)
         self.writeresponse(full_response)
 
     def is_fingerprinted(self):
@@ -73,7 +73,7 @@ class MyTelnetHandler(TelnetHandler):
         return response
 
     def authCallback(self, username, password):
-        honey_logger.info("logon credentials used: user:%s pass:%s\n", username, password)
+        honey_logger.info("[%s] logon credentials used: user:%s pass:%s\n", self.client_address[0], username, password)
 
     def writeerror(self, text):
         '''Called to write any error information (like a mistyped command).
@@ -85,11 +85,11 @@ class MyTelnetHandler(TelnetHandler):
 
     def session_start(self):
         '''Called after the user logs in.'''
-        honey_logger.debug("session started")
+        honey_logger.debug("[%s] session started", self.client_address[0])
 
     def session_end(self):
         '''Called after the user logs off.'''
-        honey_logger.debug("session ended")
+        honey_logger.debug("[%s] session ended", self.client_address[0])
 
     def handleException(self, exc_type, exc_param, exc_tb):
         # Overide default exception handling behaviour
