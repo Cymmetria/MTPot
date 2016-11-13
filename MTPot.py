@@ -92,7 +92,7 @@ class MyTelnetHandler(TelnetHandler):
         honey_logger.debug("[%s] session ended", self.client_address[0])
 
     def handleException(self, exc_type, exc_param, exc_tb):
-        # Overide default exception handling behaviour
+        # Overide default exception handling behavior
         honey_logger.debug(traceback.format_exc())
         return True
 
