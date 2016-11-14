@@ -4,6 +4,7 @@ import argparse
 import logging
 import gevent, gevent.server
 from telnetsrv.green import TelnetHandler, command
+import traceback
 
 from config import HoneyConfig, MissingConfigField
 from syslog_logger import get_syslog_logger
@@ -76,7 +77,6 @@ class MyTelnetHandler(TelnetHandler):
             COMMANDS_EXECUTED[self.client_address[0]].append(cmd)
         self.is_fingerprinted()
 
-
     def get_busybox_response(self, params):
         response = ""
         full_command = " ".join(params)
@@ -113,6 +113,11 @@ class MyTelnetHandler(TelnetHandler):
     def session_end(self):
         '''Called after the user logs off.'''
         honey_logger.debug("[%s:%d] session ended", self.client_address[0], self.client_address[1])
+
+    def handleException(self, exc_type, exc_param, exc_tb):
+        # Overide default exception handling behavior
+        honey_logger.debug(traceback.format_exc())
+        return True
 
 def get_args():
     parser = argparse.ArgumentParser()
