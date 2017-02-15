@@ -1,5 +1,7 @@
 {
+    "pool":10,
     "port": 23,
+    "timeout": 60,
     "ddos_name": "Mirai",
     "ip": "0.0.0.0",
     "commands": {
@@ -12,6 +14,9 @@
         "echo -e \\x6b\\x61\\x6d\\x69/run > /run/.nippon": "",
         "cat /run/.nippon": "kami/run",
         "rm /run/.nippon": ""
+    },
+    "overwrite_commands": {
+        "help": "Custom response for help"
     },
     "syslog_address": "127.0.0.1",
     "syslog_port": 5555,

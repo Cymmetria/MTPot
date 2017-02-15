@@ -3,14 +3,20 @@
 import argparse
 import logging
 import gevent, gevent.server
+import CustomPool
 from telnetsrv.green import TelnetHandler, command
 import traceback
 
 from config import HoneyConfig, MissingConfigField
 from syslog_logger import get_syslog_logger
+import socket
+import sys, errno
 
+default_timeout = 60 #Use to timeout the connection
 COMMANDS = {}
 COMMANDS_EXECUTED = {}
+OVERWRITE_COMMANDS = {} #Use to overwrite default telnet command behavior crahsing the handler (e.g. 'help')
+OVERWRITE_COMMANDS_LIST = ["help"] #Don't forget to update the list when adding new commands
 BUSY_BOX = "/bin/busybox"
 MIRAI_SCANNER_COMMANDS = ["shell", "sh", "enable"]
 FINGERPRINTED_IPS = []
@@ -18,12 +24,18 @@ FINGERPRINTED_IPS = []
 honey_logger = logging.getLogger("HoneyTelnet")
 syslogger = None
 config = None
+custom_pool = None
 
-class MyTelnetHandler(TelnetHandler):
+
+class MyTelnetHandler(TelnetHandler, object):
     WELCOME = 'welcome'
     PROMPT = ">"
     authNeedUser = True
     authNeedPass = True
+
+    @command(OVERWRITE_COMMANDS_LIST)
+    def telnet_commands_respond(self, params):
+        self.writeresponse(OVERWRITE_COMMANDS.get(self.input.raw, ""))
 
     @command(MIRAI_SCANNER_COMMANDS)
     def shell_respond(self, params):
@@ -119,6 +131,22 @@ class MyTelnetHandler(TelnetHandler):
         honey_logger.debug(traceback.format_exc())
         return True
 
+    #Catch tracestack error
+    def inputcooker(self):
+        try:
+            super(MyTelnetHandler, self).inputcooker()
+        except socket.timeout as e:
+            #print 'socket-'+str(self.client_address[0])+':'+str(self.client_address[1]), e
+            custom_pool.remove_connection(str(self.client_address[0]) + ':' + str(self.client_address[1]))
+            honey_logger.debug("[%s:%d] session timed out", self.client_address[0], self.client_address[1])
+            self.finish()
+        except socket.error as e:
+            if e.errno != errno.EBADF: # file descriptor error
+                raise
+            else:
+                pass
+
+
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -142,8 +170,10 @@ def get_args():
 
 def main():
     global COMMANDS
+    global OVERWRITE_COMMANDS
     global syslogger
     global config
+    global custom_pool
 
     args = get_args()
     config = HoneyConfig(args.config)
@@ -170,8 +200,22 @@ def main():
     except MissingConfigField:
         honey_logger.info("Syslog reporting disabled, to enable it add its configuration to the configuration file")
     COMMANDS = config.commands
-    server = gevent.server.StreamServer((config.ip, config.port), MyTelnetHandler.streamserver_handle)
-    honey_logger.info("Listening on %d...", config.port)
+
+    try:
+        the_timeout = config.timeout
+    except MissingConfigField:
+        the_timeout = default_timeout
+
+    try:
+        OVERWRITE_COMMANDS = config.overwrite_commands
+    except MissingConfigField:
+        OVERWRITE_COMMANDS = {}
+
+    socket.setdefaulttimeout(the_timeout)
+    custom_pool = CustomPool.CustomPool(honey_logger, config.pool)
+    server = gevent.server.StreamServer((config.ip, config.port), MyTelnetHandler.streamserver_handle, spawn=custom_pool)
+
+    honey_logger.info("Listening on %s:%d with timeout=%d", config.ip, config.port, the_timeout)
     server.serve_forever()
 
 if __name__ == '__main__':
