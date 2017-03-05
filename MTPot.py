@@ -199,7 +199,7 @@ def main():
             config.syslog_protocol)
     except MissingConfigField:
         honey_logger.info("Syslog reporting disabled, to enable it add its configuration to the configuration file")
-    COMMANDS = config.commands
+    COMMANDS = {cmd:resp.decode('string_escape') for (cmd, resp) in config.commands.items()}
 
     try:
         the_timeout = config.timeout

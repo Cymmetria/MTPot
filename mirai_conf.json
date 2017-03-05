@@ -13,7 +13,8 @@
         "rm /dev/.nippon": "",
         "echo -e \\x6b\\x61\\x6d\\x69/run > /run/.nippon": "",
         "cat /run/.nippon": "kami/run",
-        "rm /run/.nippon": ""
+        "rm /run/.nippon": "",
+        "cat /bin/echo": "\\x7fELF\\x01\\x01\\x01\\x03\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x02\\x00\\x08\\x00\\x00\\x00\\x00\\x00"
     },
     "overwrite_commands": {
         "help": "Custom response for help"
