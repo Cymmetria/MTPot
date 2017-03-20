@@ -1,7 +1,5 @@
--------
-Update:
-Cymmetria Research has released a new honeypot for the Apache Struts exploit, see more info here: https://github.com/Cymmetria/StrutsHoneypot
--------
+### Update:
+### Cymmetria Research has released a new honeypot for the Apache Struts exploit, see more info here: https://github.com/Cymmetria/StrutsHoneypot
 
 # CymmetriaResearch
 
